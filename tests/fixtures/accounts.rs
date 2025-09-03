@@ -110,7 +110,7 @@ pub fn create_delegation_metadata_data(
     is_undelegatable: bool,
 ) -> Vec<u8> {
     let delegation_metadata = DelegationMetadata {
-        last_update_external_slot: DEFAULT_LAST_UPDATE_EXTERNAL_SLOT,
+        last_update_nonce: DEFAULT_LAST_UPDATE_EXTERNAL_SLOT,
         is_undelegatable,
         seeds: seeds.iter().map(|s| s.to_vec()).collect(),
         rent_payer,
@@ -125,7 +125,7 @@ pub fn create_delegation_metadata_data(
 #[allow(dead_code)]
 pub fn get_commit_record_account_data(authority: Pubkey) -> Vec<u8> {
     let commit_record = CommitRecord {
-        slot: 100,
+        nonce: 100,
         identity: authority,
         account: DELEGATED_PDA_ID,
         lamports: LAMPORTS_PER_SOL,
