@@ -7,6 +7,7 @@ use solana_program::{
 };
 
 use crate::args::DelegateArgs;
+use crate::consts::DEFAULT_VALIDATOR_IDENTITY;
 use crate::processor::utils::curve::is_on_curve;
 use crate::processor::utils::loaders::{
     load_owned_pda, load_pda, load_program, load_signer, load_uninitialized_pda,
@@ -133,7 +134,7 @@ pub fn process_delegate(
     // Initialize the delegation record
     let delegation_record = DelegationRecord {
         owner: *owner_program.key,
-        authority: args.validator.unwrap_or(Pubkey::default()),
+        authority: args.validator.unwrap_or(DEFAULT_VALIDATOR_IDENTITY),
         commit_frequency_ms: args.commit_frequency_ms as u64,
         delegation_slot: solana_program::clock::Clock::get()?.slot,
         lamports: delegated_account.lamports(),

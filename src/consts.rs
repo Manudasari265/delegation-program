@@ -1,3 +1,4 @@
+use solana_program::pubkey;
 use solana_program::pubkey::Pubkey;
 
 /// The delegation session fees (extracted in percentage from the delegation PDAs rent on closure).
@@ -15,3 +16,7 @@ pub const EXTERNAL_CALL_HANDLER_DISCRIMINATOR: [u8; 8] = [157, 197, 228, 30, 0, 
 
 /// The program ID of the delegation program.
 pub const DELEGATION_PROGRAM_ID: Pubkey = crate::id();
+
+/// Default validator identity (used when none is provided during delegation).
+pub const DEFAULT_VALIDATOR_IDENTITY: Pubkey =
+    pubkey!("MAS1Dt9qreoRMQ14YQuhg8UTZMMzDdKhmkZMECCzk57");
