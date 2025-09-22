@@ -4,7 +4,10 @@ pub const DELEGATION_RECORD_TAG: &[u8] = b"delegation";
 #[macro_export]
 macro_rules! delegation_record_seeds_from_delegated_account {
     ($delegated_account: expr) => {
-        &[$crate::pda::DELEGATION_RECORD_TAG, &$delegated_account.as_ref()]
+        &[
+            $crate::pda::DELEGATION_RECORD_TAG,
+            &$delegated_account.as_ref(),
+        ]
     };
 }
 
@@ -12,7 +15,10 @@ pub const DELEGATION_METADATA_TAG: &[u8] = b"delegation-metadata";
 #[macro_export]
 macro_rules! delegation_metadata_seeds_from_delegated_account {
     ($delegated_account: expr) => {
-        &[$crate::pda::DELEGATION_METADATA_TAG, &$delegated_account.as_ref()]
+        &[
+            $crate::pda::DELEGATION_METADATA_TAG,
+            &$delegated_account.as_ref(),
+        ]
     };
 }
 
@@ -36,7 +42,10 @@ pub const DELEGATE_BUFFER_TAG: &[u8] = b"buffer";
 #[macro_export]
 macro_rules! delegate_buffer_seeds_from_delegated_account {
     ($delegated_account: expr) => {
-        &[$crate::pda::DELEGATE_BUFFER_TAG, &$delegated_account.as_ref()]
+        &[
+            $crate::pda::DELEGATE_BUFFER_TAG,
+            &$delegated_account.as_ref(),
+        ]
     };
 }
 
@@ -44,7 +53,10 @@ pub const UNDELEGATE_BUFFER_TAG: &[u8] = b"undelegate-buffer";
 #[macro_export]
 macro_rules! undelegate_buffer_seeds_from_delegated_account {
     ($delegated_account: expr) => {
-        &[$crate::pda::UNDELEGATE_BUFFER_TAG, &$delegated_account.as_ref()]
+        &[
+            $crate::pda::UNDELEGATE_BUFFER_TAG,
+            &$delegated_account.as_ref(),
+        ]
     };
 }
 
@@ -75,7 +87,11 @@ pub const EPHEMERAL_BALANCE_TAG: &[u8] = b"balance";
 #[macro_export]
 macro_rules! ephemeral_balance_seeds_from_payer {
     ($payer: expr, $index: expr) => {
-        &[$crate::pda::EPHEMERAL_BALANCE_TAG, &$payer.as_ref(), &[$index]]
+        &[
+            $crate::pda::EPHEMERAL_BALANCE_TAG,
+            &$payer.as_ref(),
+            &[$index],
+        ]
     };
 }
 
