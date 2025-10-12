@@ -22,6 +22,9 @@ pub mod pda;
 mod processor;
 pub mod state;
 
+#[cfg(feature = "log-cost")]
+mod cu;
+
 declare_id!("DELeGGvXpWV2fqJUhqcF5ZSYMS4JTLjteaAMARRSaeSh");
 
 pub mod fast {
@@ -104,6 +107,9 @@ pub fn fast_process_instruction(
 
     match discriminator {
         discriminator::DlpDiscriminator::Delegate => Some(processor::fast::process_delegate(
+            program_id, accounts, data,
+        )),
+        discriminator::DlpDiscriminator::Undelegate => Some(processor::fast::process_undelegate(
             program_id, accounts, data,
         )),
         _ => None,
