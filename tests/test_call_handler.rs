@@ -301,7 +301,7 @@ async fn test_finalize_call_handler() {
         ],
         CallHandlerArgs {
             escrow_index: 2, // undelegated escrow index,
-            instruction_data: to_vec(&PRIZE).unwrap(),
+            data: to_vec(&PRIZE).unwrap(),
             context: dlp::args::Context::Commit,
         },
     );
@@ -350,7 +350,7 @@ async fn test_undelegate_call_handler() {
         ],
         CallHandlerArgs {
             escrow_index: 2, // undelegated escrow index,
-            instruction_data: to_vec(&PRIZE).unwrap(),
+            data: to_vec(&PRIZE).unwrap(),
             context: dlp::args::Context::Undelegate,
         },
     );
@@ -399,7 +399,7 @@ async fn test_finalize_invalid_escrow_call_handler() {
         vec![AccountMeta::new(transfer_destination.pubkey(), false)],
         CallHandlerArgs {
             escrow_index: 0,
-            instruction_data: vec![],
+            data: vec![],
             context: dlp::args::Context::Commit,
         },
     );
@@ -432,7 +432,7 @@ async fn test_undelegate_invalid_escow_call_handler() {
         vec![AccountMeta::new(destination.pubkey(), false)],
         CallHandlerArgs {
             escrow_index: 0,
-            instruction_data: vec![],
+            data: vec![],
             context: dlp::args::Context::Commit,
         },
     );
@@ -450,7 +450,7 @@ async fn test_undelegate_invalid_escow_call_handler() {
         vec![AccountMeta::new(destination.pubkey(), false)],
         CallHandlerArgs {
             escrow_index: 0,
-            instruction_data: to_vec(&PRIZE).unwrap(),
+            data: to_vec(&PRIZE).unwrap(),
             context: dlp::args::Context::Undelegate,
         },
     );

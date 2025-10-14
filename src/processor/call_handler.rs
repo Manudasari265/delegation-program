@@ -110,7 +110,7 @@ pub fn process_call_handler(
 
     let handler_instruction = Instruction {
         program_id: *destination_program.key,
-        data: args.instruction_data,
+        data: args.data,
         accounts: accounts_meta,
     };
     let bump_slice = &[escrow_bump];
