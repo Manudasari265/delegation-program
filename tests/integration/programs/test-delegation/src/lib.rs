@@ -1,7 +1,6 @@
 use anchor_lang::prelude::*;
 use ephemeral_rollups_sdk::anchor::{delegate, ephemeral};
 use ephemeral_rollups_sdk::cpi::DelegateConfig;
-use ephemeral_rollups_sdk::pda::ephemeral_balance_pda_from_payer;
 
 declare_id!("3vAK9JQiDsKoQNwmcfeEng4Cnv22pYuj1ASfso7U4ukF");
 
@@ -68,59 +67,48 @@ pub mod test_delegation {
     }
 
     /// Delegation program call handler
-    pub fn delegation_program_call_handler(
-        ctx: Context<DelegationProgramCallHandler>,
-        hook_args: delegation_program_utils::CallHandlerArgs,
+    #[instruction(discriminator = [1, 0, 1, 0])]
+    pub fn commit_base_action_handler(
+        ctx: Context<CommitBaseActionHandler>,
+        amount: u64,
     ) -> Result<()> {
-        let expected = ephemeral_balance_pda_from_payer(
-            ctx.accounts.escrow_authority.key,
-            hook_args.escrow_index,
-        );
-        if &expected != ctx.accounts.escrow_account.key {
-            Err(ProgramError::InvalidAccountData)
-        } else {
-            Ok(())
-        }?;
-
+        msg!("commit_base_action_handler!");
         if !ctx.accounts.escrow_account.is_signer {
             Err(ProgramError::MissingRequiredSignature)
         } else {
             Ok(())
         }?;
 
-        match hook_args.context {
-            delegation_program_utils::Context::Commit => {
-                msg!("commit context");
-                let amount = u64::try_from_slice(&hook_args.data)?;
-                let transfer_ctx = CpiContext::new(
-                    ctx.accounts.system_program.to_account_info(),
-                    Transfer {
-                        from: ctx.accounts.escrow_account.to_account_info(),
-                        to: ctx.accounts.destination_account.to_account_info(),
-                    },
-                );
-                transfer(transfer_ctx, amount)?;
-            }
-            delegation_program_utils::Context::Undelegate => {
-                msg!("undelegate context");
-                let amount = u64::try_from_slice(&hook_args.data)?;
-                let transfer_ctx = CpiContext::new(
-                    ctx.accounts.system_program.to_account_info(),
-                    Transfer {
-                        from: ctx.accounts.escrow_account.to_account_info(),
-                        to: ctx.accounts.destination_account.to_account_info(),
-                    },
-                );
-                transfer(transfer_ctx, amount)?;
+        let transfer_ctx = CpiContext::new(
+            ctx.accounts.system_program.to_account_info(),
+            Transfer {
+                from: ctx.accounts.escrow_account.to_account_info(),
+                to: ctx.accounts.destination_account.to_account_info(),
+            },
+        );
 
-                let counter_data = &mut ctx.accounts.counter.try_borrow_mut_data()?;
-                let mut counter = Counter::try_from_slice(&counter_data)?;
-                counter.count += 1;
+        transfer(transfer_ctx, amount)
+    }
 
-                counter_data.copy_from_slice(&counter.try_to_vec()?);
-            }
-            delegation_program_utils::Context::Standalone => msg!("standalone context"),
-        }
+    #[instruction(discriminator = [1, 0, 2, 0])]
+    pub fn undelegate_base_action_handler(
+        ctx: Context<UndelegateBaseActionHandler>,
+        amount: u64,
+    ) -> Result<()> {
+        msg!("undelegate_base_action_handler");
+        let transfer_ctx = CpiContext::new(
+            ctx.accounts.system_program.to_account_info(),
+            Transfer {
+                from: ctx.accounts.escrow_account.to_account_info(),
+                to: ctx.accounts.destination_account.to_account_info(),
+            },
+        );
+        transfer(transfer_ctx, amount)?;
+
+        let counter_data = &mut ctx.accounts.counter.try_borrow_mut_data()?;
+        let mut counter = Counter::try_from_slice(&counter_data)?;
+        counter.count += 1;
+        counter_data.copy_from_slice(&counter.try_to_vec()?);
 
         Ok(())
     }
@@ -194,16 +182,20 @@ pub struct Increment<'info> {
 }
 
 #[derive(Accounts)]
-#[instruction(hook_args: delegation_program_utils::CallHandlerArgs)]
-pub struct DelegationProgramCallHandler<'info> {
+pub struct CommitBaseActionHandler<'info> {
     /// CHECK: The authority that owns the escrow account
     pub escrow_authority: UncheckedAccount<'info>,
-    #[account(
-        mut,
-        seeds = [b"balance", &escrow_authority.key().as_ref(), &[hook_args.escrow_index]],
-        seeds::program = delegation_program_utils::ID,
-        bump
-    )]
+    pub escrow_account: Signer<'info>,
+    /// CHECK: The destination account to transfer lamports to
+    #[account(mut)]
+    pub destination_account: AccountInfo<'info>,
+    pub system_program: Program<'info, System>,
+}
+
+#[derive(Accounts)]
+pub struct UndelegateBaseActionHandler<'info> {
+    /// CHECK: The authority that owns the escrow account
+    pub escrow_authority: UncheckedAccount<'info>,
     pub escrow_account: Signer<'info>,
     /// CHECK: The destination account to transfer lamports to
     #[account(mut)]
