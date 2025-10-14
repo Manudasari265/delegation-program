@@ -222,18 +222,4 @@ mod delegation_program_utils {
     use anchor_lang::prelude::*;
 
     declare_id!("DELeGGvXpWV2fqJUhqcF5ZSYMS4JTLjteaAMARRSaeSh");
-
-    #[derive(AnchorSerialize, AnchorDeserialize)]
-    pub enum Context {
-        Commit,
-        Undelegate,
-        Standalone,
-    }
-
-    #[derive(AnchorSerialize, AnchorDeserialize)]
-    pub struct CallHandlerArgs {
-        pub escrow_index: u8,
-        pub data: Vec<u8>,
-        pub context: Context,
-    }
 }
