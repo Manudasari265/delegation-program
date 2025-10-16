@@ -73,12 +73,6 @@ pub mod test_delegation {
         amount: u64,
     ) -> Result<()> {
         msg!("commit_base_action_handler!");
-        if !ctx.accounts.escrow_account.is_signer {
-            Err(ProgramError::MissingRequiredSignature)
-        } else {
-            Ok(())
-        }?;
-
         let transfer_ctx = CpiContext::new(
             ctx.accounts.system_program.to_account_info(),
             Transfer {
