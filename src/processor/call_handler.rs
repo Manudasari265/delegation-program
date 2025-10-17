@@ -90,23 +90,22 @@ pub fn process_call_handler(
     load_owned_pda(escrow_account, &system_program::id(), INVALID_ESCROW_OWNER)?;
 
     // deduce necessary accounts for CPI
-    let (accounts_meta, handler_accounts): (Vec<AccountMeta>, Vec<AccountInfo>) =
-        [escrow_authority_account, escrow_account]
-            .into_iter()
-            .chain(other_accounts)
-            .filter(|account| account.key != validator.key)
-            .map(|account| {
-                (
-                    // We enable only escrow to be a signer
-                    AccountMeta {
-                        pubkey: *account.key,
-                        is_writable: account.is_writable,
-                        is_signer: account.key == escrow_account.key,
-                    },
-                    account.clone(),
-                )
-            })
-            .collect();
+    let (accounts_meta, handler_accounts): (Vec<AccountMeta>, Vec<AccountInfo>) = other_accounts
+        .iter()
+        .chain([escrow_authority_account, escrow_account])
+        .filter(|account| account.key != validator.key)
+        .map(|account| {
+            (
+                // We enable only escrow to be a signer
+                AccountMeta {
+                    pubkey: *account.key,
+                    is_writable: account.is_writable,
+                    is_signer: account.key == escrow_account.key,
+                },
+                account.clone(),
+            )
+        })
+        .collect();
 
     let handler_instruction = Instruction {
         program_id: *destination_program.key,

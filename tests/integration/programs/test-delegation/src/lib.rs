@@ -177,26 +177,26 @@ pub struct Increment<'info> {
 
 #[derive(Accounts)]
 pub struct CommitBaseActionHandler<'info> {
-    /// CHECK: The authority that owns the escrow account
-    pub escrow_authority: UncheckedAccount<'info>,
-    pub escrow_account: Signer<'info>,
     /// CHECK: The destination account to transfer lamports to
     #[account(mut)]
     pub destination_account: AccountInfo<'info>,
     pub system_program: Program<'info, System>,
+    /// CHECK: The authority that owns the escrow account
+    pub escrow_authority: UncheckedAccount<'info>,
+    pub escrow_account: Signer<'info>,
 }
 
 #[derive(Accounts)]
 pub struct UndelegateBaseActionHandler<'info> {
-    /// CHECK: The authority that owns the escrow account
-    pub escrow_authority: UncheckedAccount<'info>,
-    pub escrow_account: Signer<'info>,
     /// CHECK: The destination account to transfer lamports to
     #[account(mut)]
     pub destination_account: AccountInfo<'info>,
     /// CHECK: fails in finalize stage due to ownership by dlp
     pub counter: UncheckedAccount<'info>,
     pub system_program: Program<'info, System>,
+    /// CHECK: The authority that owns the escrow account
+    pub escrow_authority: UncheckedAccount<'info>,
+    pub escrow_account: Signer<'info>,
 }
 
 #[account]
