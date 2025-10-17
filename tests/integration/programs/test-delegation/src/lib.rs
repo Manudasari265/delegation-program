@@ -191,9 +191,9 @@ pub struct UndelegateBaseActionHandler<'info> {
     /// CHECK: The destination account to transfer lamports to
     #[account(mut)]
     pub destination_account: AccountInfo<'info>,
-    /// CHECK: The authority that owns the escrow account
-    pub escrow_authority: UncheckedAccount<'info>,
-    pub escrow_account: Signer<'info>,
+    /// CHECK: fails in finalize stage due to ownership by dlp
+    pub counter: UncheckedAccount<'info>,
+    pub system_program: Program<'info, System>,
     /// CHECK: The authority that owns the escrow account
     pub escrow_authority: UncheckedAccount<'info>,
     pub escrow_account: Signer<'info>,
