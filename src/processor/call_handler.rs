@@ -1,5 +1,4 @@
 use crate::args::CallHandlerArgs;
-use crate::consts::EXTERNAL_CALL_HANDLER_DISCRIMINATOR;
 use crate::ephemeral_balance_seeds_from_payer;
 use crate::processor::utils::loaders::{
     load_initialized_validator_fees_vault, load_owned_pda, load_pda, load_signer,
@@ -109,10 +108,9 @@ pub fn process_call_handler(
             })
             .collect();
 
-    let data = [EXTERNAL_CALL_HANDLER_DISCRIMINATOR.to_vec(), data.to_vec()].concat();
     let handler_instruction = Instruction {
         program_id: *destination_program.key,
-        data,
+        data: args.data,
         accounts: accounts_meta,
     };
     let bump_slice = &[escrow_bump];
