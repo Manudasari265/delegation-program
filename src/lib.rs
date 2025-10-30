@@ -61,17 +61,8 @@ pub fn fast_process_instruction(
         }
     };
 
-    #[cfg(feature = "unit_test_config")]
-    if matches!(
-        discriminator,
-        DlpDiscriminator::Delegate
-            | DlpDiscriminator::CommitState
-            | DlpDiscriminator::CommitStateFromBuffer
-            | DlpDiscriminator::Finalize
-            | DlpDiscriminator::Undelegate
-    ) {
-        msg!("Processing instruction: {:?}", discriminator);
-    }
+    #[cfg(feature = "logging")]
+    msg!("Processing instruction: {:?}", discriminator);
 
     match discriminator {
         DlpDiscriminator::Delegate => Some(processor::fast::process_delegate(
@@ -105,7 +96,6 @@ pub fn slow_process_instruction(
     let (tag, data) = data.split_at(8);
     let ix = DlpDiscriminator::try_from(tag[0]).or(Err(ProgramError::InvalidInstructionData))?;
 
-    msg!("Processing instruction: {:?}", ix);
     match ix {
         DlpDiscriminator::InitValidatorFeesVault => {
             processor::process_init_validator_fees_vault(program_id, accounts, data)?
