@@ -3,10 +3,13 @@
 use crate::discriminator::DlpDiscriminator;
 use pinocchio_log::log;
 use solana_program::account_info::AccountInfo;
+use solana_program::declare_id;
 use solana_program::entrypoint::ProgramResult;
 use solana_program::program_error::ProgramError;
 use solana_program::pubkey::Pubkey;
-use solana_program::{declare_id, msg};
+
+#[cfg(feature = "logging")]
+use solana_program::msg;
 
 pub mod args;
 pub mod consts;
