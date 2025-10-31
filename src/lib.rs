@@ -3,10 +3,13 @@
 use crate::discriminator::DlpDiscriminator;
 use pinocchio_log::log;
 use solana_program::account_info::AccountInfo;
+use solana_program::declare_id;
 use solana_program::entrypoint::ProgramResult;
 use solana_program::program_error::ProgramError;
 use solana_program::pubkey::Pubkey;
-use solana_program::{declare_id, msg};
+
+#[cfg(feature = "logging")]
+use solana_program::msg;
 
 pub mod args;
 pub mod consts;
@@ -61,6 +64,9 @@ pub fn fast_process_instruction(
         }
     };
 
+    #[cfg(feature = "logging")]
+    msg!("Processing instruction: {:?}", discriminator);
+
     match discriminator {
         DlpDiscriminator::Delegate => Some(processor::fast::process_delegate(
             program_id, accounts, data,
@@ -93,7 +99,6 @@ pub fn slow_process_instruction(
     let (tag, data) = data.split_at(8);
     let ix = DlpDiscriminator::try_from(tag[0]).or(Err(ProgramError::InvalidInstructionData))?;
 
-    msg!("Processing instruction: {:?}", ix);
     match ix {
         DlpDiscriminator::InitValidatorFeesVault => {
             processor::process_init_validator_fees_vault(program_id, accounts, data)?
