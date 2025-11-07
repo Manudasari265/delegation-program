@@ -1,27 +1,45 @@
-#![allow(unexpected_cfgs)] // silence clippy for target_os solana and other solana program custom features
+#![allow(unexpected_cfgs)]
 
-use crate::discriminator::DlpDiscriminator;
-use pinocchio_log::log;
-use solana_program::account_info::AccountInfo;
+// Exactly one of `sdk` or `program` must be enabled
+#[cfg(all(feature = "sdk", feature = "program"))]
+compile_error!("Features `sdk` and `program` are mutually exclusive. Enable exactly one.");
+
+#[cfg(all(not(feature = "sdk"), not(feature = "program")))]
+compile_error!(
+    "Enable either `program` (default) or `sdk`. Building with neither is not supported."
+);
+
+#[cfg(not(feature = "sdk"))]
+use {
+    crate::discriminator::DlpDiscriminator,
+    solana_program::{
+        account_info::AccountInfo, entrypoint::ProgramResult, program_error::ProgramError,
+        pubkey::Pubkey,
+    },
+};
+
 use solana_program::declare_id;
-use solana_program::entrypoint::ProgramResult;
-use solana_program::program_error::ProgramError;
-use solana_program::pubkey::Pubkey;
 
 #[cfg(feature = "logging")]
 use solana_program::msg;
 
 pub mod args;
 pub mod consts;
+#[cfg(not(feature = "sdk"))]
 mod discriminator;
+#[cfg(not(feature = "sdk"))]
 pub mod error;
+#[cfg(not(feature = "sdk"))]
 pub mod instruction_builder;
 pub mod pda;
 pub mod state;
 
+#[cfg(not(feature = "sdk"))]
 mod diff;
+#[cfg(not(feature = "sdk"))]
 mod processor;
 
+#[cfg(not(feature = "sdk"))]
 pub use diff::*;
 
 #[cfg(feature = "log-cost")]
@@ -32,20 +50,22 @@ mod entrypoint;
 
 declare_id!("DELeGGvXpWV2fqJUhqcF5ZSYMS4JTLjteaAMARRSaeSh");
 
+#[cfg(not(feature = "sdk"))]
 pub mod fast {
     pinocchio_pubkey::declare_id!("DELeGGvXpWV2fqJUhqcF5ZSYMS4JTLjteaAMARRSaeSh");
 }
 
-#[cfg(all(not(feature = "no-entrypoint"), feature = "solana-security-txt"))]
+#[cfg(feature = "solana-security-txt")]
 solana_security_txt::security_txt! {
     name: "MagicBlock Delegation Program",
-    project_url: "https://magicblock.gg",
+    project_url: "https://magicblock.xyz",
     contacts: "email:dev@magicblock.gg,twitter:@magicblock",
     policy: "https://github.com/magicblock-labs/delegation-program/blob/master/LICENSE.md",
     preferred_languages: "en",
     source_code: "https://github.com/magicblock-labs/delegation-program"
 }
 
+#[cfg(not(feature = "sdk"))]
 pub fn fast_process_instruction(
     program_id: &pinocchio::pubkey::Pubkey,
     accounts: &[pinocchio::account_info::AccountInfo],
@@ -62,7 +82,7 @@ pub fn fast_process_instruction(
     let discriminator = match DlpDiscriminator::try_from(discriminator_bytes[0]) {
         Ok(discriminator) => discriminator,
         Err(_) => {
-            log!("Failed to read and parse discriminator");
+            pinocchio_log::log!("Failed to read and parse discriminator");
             return Some(Err(
                 pinocchio::program_error::ProgramError::InvalidInstructionData,
             ));
@@ -95,6 +115,7 @@ pub fn fast_process_instruction(
     }
 }
 
+#[cfg(not(feature = "sdk"))]
 pub fn slow_process_instruction(
     program_id: &Pubkey,
     accounts: &[AccountInfo],
@@ -139,7 +160,8 @@ pub fn slow_process_instruction(
             processor::process_call_handler(program_id, accounts, data)?
         }
         _ => {
-            log!("PANIC: Instruction must be processed by fast_process_instruction");
+            #[cfg(feature = "logging")]
+            msg!("PANIC: Instruction must be processed by fast_process_instruction");
             return Err(ProgramError::InvalidInstructionData);
         }
     }
